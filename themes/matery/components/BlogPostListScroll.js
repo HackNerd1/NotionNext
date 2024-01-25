@@ -14,7 +14,12 @@ import throttle from 'lodash.throttle'
  * @returns {JSX.Element}
  * @constructor
  */
-const BlogPostListScroll = ({ posts = [], currentSearch, showSummary = siteConfig('MATERY_POST_LIST_SUMMARY', null, CONFIG), siteInfo }) => {
+const BlogPostListScroll = ({
+  posts = [],
+  currentSearch,
+  showSummary = siteConfig('MATERY_POST_LIST_SUMMARY', null, CONFIG),
+  siteInfo
+}) => {
   const postsPerPage = parseInt(siteConfig('POSTS_PER_PAGE'))
   const [page, updatePage] = useState(1)
   const postsToShow = getListByPage(posts, page, postsPerPage)
@@ -40,36 +45,53 @@ const BlogPostListScroll = ({ posts = [], currentSearch, showSummary = siteConfi
   }
 
   const throttleMs = 200
-  const scrollTrigger = useCallback(throttle(() => {
-    requestAnimationFrame(() => {
-      const scrollS = window.scrollY + window.outerHeight
-      const clientHeight = targetRef ? (targetRef.current ? (targetRef.current.clientHeight) : 0) : 0
-      if (scrollS > clientHeight + 100) {
-        handleGetMore()
-      }
-    })
-  }, throttleMs))
+  const scrollTrigger = useCallback(
+    throttle(() => {
+      requestAnimationFrame(() => {
+        const scrollS = window.scrollY + window.outerHeight
+        const clientHeight = targetRef
+          ? targetRef.current
+            ? targetRef.current.clientHeight
+            : 0
+          : 0
+        if (scrollS > clientHeight + 100) {
+          handleGetMore()
+        }
+      })
+    }, throttleMs)
+  )
 
   if (!postsToShow || postsToShow.length === 0) {
     return <BlogPostListEmpty currentSearch={currentSearch} />
   } else {
-    return <div id='container' ref={targetRef} className='w-full'>
-
-      {/* 文章列表 */}
-      <div className="pt-4 flex flex-wrap pb-12" >
-        {postsToShow.map(post => (
-            <div key={post.id} className='xl:w-1/3 md:w-1/2 w-full p-4'>
-            <BlogPostCard index={posts.indexOf(post)} post={post} siteInfo={siteInfo} />
+    return (
+      <div id="container" ref={targetRef} className="w-full">
+        {/* 文章列表 */}
+        <div className="pt-4 flex flex-wrap pb-12">
+          {postsToShow.map(post => (
+            <div key={post.id} className="xl:w-1/2 md:w-1/2 w-full p-4">
+              <BlogPostCard
+                index={posts.indexOf(post)}
+                post={post}
+                siteInfo={siteInfo}
+              />
             </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      <div>
-        <div onClick={() => { handleGetMore() }}
-             className='w-full my-4 py-4 text-center cursor-pointer rounded-xl dark:text-gray-200'
-        > {hasMore ? locale.COMMON.MORE : `${locale.COMMON.NO_MORE}`} </div>
+        <div>
+          <div
+            onClick={() => {
+              handleGetMore()
+            }}
+            className="w-full my-4 py-4 text-center cursor-pointer rounded-xl dark:text-gray-200"
+          >
+            {' '}
+            {hasMore ? locale.COMMON.MORE : `${locale.COMMON.NO_MORE}`}{' '}
+          </div>
+        </div>
       </div>
-    </div>
+    )
   }
 }
 
